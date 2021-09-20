@@ -1,0 +1,91 @@
+DROP DATABASE if exists	Testing_System_Assigment1;
+CREATE DATABASE			Testing_System_Assigment1;
+USE						Testing_System_Assigment1;
+
+CREATE TABLE			Department(
+DepartmentID			INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+DepartmentName			VARCHAR(50) NOT NULL UNIQUE KEY
+);
+
+CREATE TABLE 			`Position`(
+PositionID				INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+PositionName			ENUM('Dev','Test','Scrum Master','PM') NOT NULL UNIQUE KEY
+);
+
+CREATE TABLE 			`Account`(
+AccountID				INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+Email					VARCHAR(50) NOT NULL,
+Username				VARCHAR(50) NOT NULL,
+Fullname				VARCHAR(100) NOT NULL,
+DepartmentID			INT UNSIGNED NOT NULL,
+PositionID				INT UNSIGNED NOT NULL,
+CreateDate				DATETIME default NOW(),
+FOREIGN KEY(DepartmentID) REFERENCES Department(DepartmentID),
+FOREIGN KEY(PositionID) REFERENCES `Position`(PositionID)
+);
+
+CREATE TABLE 			`Group`(
+GroupID					INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+GroupName				VARCHAR(50) NOT NULL UNIQUE KEY,
+CreatorID				INT UNSIGNED NOT NULL,
+CreateDate				DATETIME DEFAULT NOW(),
+FOREIGN KEY(CreatorID) REFERENCES `Account`(AccountID)
+);
+
+CREATE TABLE 			GroupAccount(
+GroupID					INT UNSIGNED NOT NULL,
+AccountID				INT UNSIGNED NOT NULL,
+JoinDate				DATETIME DEFAULT NOW(),
+FOREIGN KEY(GroupID) REFERENCES `Group`(GroupID),
+FOREIGN KEY(AccountID) REFERENCES`Account`(AccountID)
+);
+
+CREATE TABLE 			TypeQuestion(
+TypeID					INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+TypeName				ENUM('Essay','Multiple-Choice') NOT NULL UNIQUE KEY
+);
+
+CREATE TABLE			CategoryQuestion(
+CategoryID				INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+CategoryName			VARCHAR(100)
+);
+
+CREATE TABLE			Question(
+QuestionID				INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+Content					VARCHAR(200) NOT NULL,
+CategoryID				INT UNSIGNED NOT NULL,
+TypeID					INT UNSIGNED NOT NULL,
+CreatorID				INT UNSIGNED NOT NULL,
+CreateDate				DATETIME DEFAULT NOW(),
+FOREIGN KEY (CategoryID) references CategoryQuestion(CategoryID),
+FOREIGN KEY (TypeID) references TypeQuestion(TypeID),
+FOREIGN KEY (CreatorID) references `Account`(AccountID)
+);
+
+CREATE TABLE 			Answer(
+AnswerID				INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+Content					VARCHAR(100) NOT NULL,
+QuestionID				INT UNSIGNED NOT NULL,
+isCorrect				CHUA HIEU,
+FOREIGN KEY(QuestionID) REFERENCES Question(QuestionID)
+);
+
+CREATE TABLE 			Exam(
+ExamID					INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+`Code`					VARCHAR(100) NOT NULL,
+Title					VARCHAR(100) NOT NULL,
+CategoryID				INT UNSIGNED NOT NULL,
+Duration				INT UNSIGNED NOT NULL,
+CreatorID				INT UNSIGNED NOT NULL,
+CreateDate				DATETIME DEFAULT NOW(),
+FOREIGN KEY(CategoryID) REFERENCES CategoryQuestion(CategoryID),
+FOREIGN KEY(CreatorID) REFERENCES `Account`(AccountID)
+);
+
+CREATE TABLE 			ExamQuestion(
+ExamID					INT UNSIGNED NOT NULL,
+QuestionID				INT UNSIGNED NOT NULL,
+FOREIGN KEY(QuestionID) REFERENCES Question(QuestionID),
+FOREIGN KEY(ExamID) REFERENCES Exam(ExamID),
+PRIMARY KEY (ExamID,QuestionID)
+);
